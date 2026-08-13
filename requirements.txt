@@ -1,0 +1,8 @@
+streamlit>=1.30.0
+numpy>=1.24.0
+pydantic>=2.0.0
+rich>=13.0.0
+pytest>=7.0.0
+# Optional / Pluggable dependencies:
+# foundry-local-sdk (for Microsoft Foundry Local)
+# sentence-transformers (for local embedding model fine-tuning)
