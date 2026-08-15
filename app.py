@@ -28,20 +28,23 @@ HTML_TEMPLATE = r"""
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Local RAG AI Assistant - Microsoft Foundry Local</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>Foundry Local - Offline RAG Intelligence Studio</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #0f172a;
-            --card-bg: #1e293b;
-            --card-border: #334155;
-            --accent-color: #38bdf8;
-            --accent-hover: #0284c7;
+            --bg-dark: #090d16;
+            --sidebar-bg: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --accent-cyan: #38bdf8;
+            --accent-glow: rgba(56, 189, 248, 0.25);
+            --accent-purple: #a855f7;
+            --accent-emerald: #10b981;
             --text-primary: #f8fafc;
             --text-secondary: #94a3b8;
-            --user-msg-bg: #0369a1;
-            --assistant-msg-bg: #1e293b;
-            --danger-color: #ef4444;
+            --user-msg-bg: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+            --assistant-msg-bg: rgba(30, 41, 59, 0.85);
+            --danger-color: #f43f5e;
         }
 
         * {
@@ -52,109 +55,157 @@ HTML_TEMPLATE = r"""
         }
 
         body {
-            background-color: var(--bg-color);
+            background-color: var(--bg-dark);
             color: var(--text-primary);
             display: flex;
             height: 100vh;
             overflow: hidden;
         }
 
+        /* Sidebar Styling */
         .sidebar {
-            width: 330px;
-            background-color: #1e293b;
+            width: 340px;
+            background-color: var(--sidebar-bg);
             border-right: 1px solid var(--card-border);
             display: flex;
             flex-direction: column;
-            padding: 20px;
-            gap: 16px;
+            padding: 22px;
+            gap: 18px;
             overflow-y: auto;
+            backdrop-filter: blur(10px);
         }
 
         .brand {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 14px;
         }
 
         .brand-icon {
-            font-size: 28px;
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, #38bdf8 0%, #a855f7 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            box-shadow: 0 0 20px var(--accent-glow);
         }
 
         .brand-title {
-            font-size: 1.25rem;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.35rem;
             font-weight: 700;
-            color: var(--accent-color);
+            background: linear-gradient(135deg, #38bdf8 0%, #c084fc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         .brand-subtitle {
-            font-size: 0.8rem;
+            font-size: 0.78rem;
             color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(16, 185, 129, 0.12);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: var(--accent-emerald);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--accent-emerald);
+            border-radius: 50%;
+            animation: pulse 1.8s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
         }
 
         .section-title {
-            font-size: 0.8rem;
-            font-weight: 600;
+            font-size: 0.78rem;
+            font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.08em;
             color: var(--text-secondary);
             margin-bottom: 8px;
         }
 
         .stats-card {
-            background: rgba(15, 23, 42, 0.6);
+            background: var(--card-bg);
             border: 1px solid var(--card-border);
-            border-radius: 12px;
-            padding: 14px;
+            border-radius: 14px;
+            padding: 16px;
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 12px;
             text-align: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
         }
 
         .stat-value {
-            font-size: 1.3rem;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.45rem;
             font-weight: 700;
-            color: var(--accent-color);
+            color: var(--accent-cyan);
         }
 
         .stat-label {
             font-size: 0.75rem;
             color: var(--text-secondary);
+            font-weight: 500;
         }
 
         .control-group {
-            background: rgba(15, 23, 42, 0.4);
+            background: var(--card-bg);
             border: 1px solid var(--card-border);
-            border-radius: 10px;
-            padding: 12px;
+            border-radius: 14px;
+            padding: 16px;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 14px;
         }
 
         .control-label {
             display: flex;
             justify-content: space-between;
-            font-size: 0.8rem;
+            font-size: 0.82rem;
             color: var(--text-primary);
-            font-weight: 500;
+            font-weight: 600;
         }
 
         .slider {
             width: 100%;
-            accent-color: var(--accent-color);
+            height: 6px;
+            border-radius: 3px;
+            accent-color: var(--accent-cyan);
+            background: #334155;
+            cursor: pointer;
         }
 
         .btn {
-            background-color: var(--card-border);
+            background: var(--card-bg);
             color: var(--text-primary);
-            border: none;
-            border-radius: 8px;
-            padding: 10px 14px;
+            border: 1px solid var(--card-border);
+            border-radius: 10px;
+            padding: 11px 16px;
             font-weight: 600;
             font-size: 0.85rem;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.25s ease;
             width: 100%;
             display: flex;
             align-items: center;
@@ -163,40 +214,47 @@ HTML_TEMPLATE = r"""
         }
 
         .btn:hover {
-            background-color: var(--accent-hover);
-            color: white;
+            transform: translateY(-1px);
+            border-color: var(--accent-cyan);
+            box-shadow: 0 4px 16px var(--accent-glow);
         }
 
         .btn-primary {
-            background-color: #0284c7;
+            background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
             color: white;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #0369a1 0%, #075985 100%);
         }
 
         .btn-secondary {
-            background-color: #0f172a;
-            border: 1px dashed var(--accent-color);
-            color: var(--accent-color);
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px dashed var(--accent-cyan);
+            color: var(--accent-cyan);
         }
 
         .btn-danger {
-            background-color: rgba(239, 68, 68, 0.15);
+            background: rgba(244, 63, 94, 0.12);
             color: var(--danger-color);
-            border: 1px solid rgba(239, 68, 68, 0.3);
-            padding: 4px 8px;
-            font-size: 0.75rem;
+            border: 1px solid rgba(244, 63, 94, 0.25);
+            padding: 4px 10px;
+            font-size: 0.72rem;
+            border-radius: 6px;
             width: auto;
         }
 
         .btn-danger:hover {
-            background-color: var(--danger-color);
+            background: var(--danger-color);
             color: white;
         }
 
         .doc-list {
             display: flex;
             flex-direction: column;
-            gap: 6px;
-            max-height: 140px;
+            gap: 8px;
+            max-height: 150px;
             overflow-y: auto;
         }
 
@@ -204,10 +262,10 @@ HTML_TEMPLATE = r"""
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: #0f172a;
-            padding: 6px 10px;
-            border-radius: 6px;
-            font-size: 0.78rem;
+            background: rgba(15, 23, 42, 0.6);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.8rem;
             border: 1px solid var(--card-border);
         }
 
@@ -216,28 +274,33 @@ HTML_TEMPLATE = r"""
             overflow: hidden;
             text-overflow: ellipsis;
             max-width: 170px;
+            font-weight: 500;
         }
 
+        /* Main Workspace Container */
         .main-container {
             flex: 1;
             display: flex;
             flex-direction: column;
             height: 100vh;
+            background: radial-gradient(circle at top right, rgba(56, 189, 248, 0.05) 0%, transparent 60%);
         }
 
         .header-banner {
-            padding: 16px 28px;
-            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            padding: 18px 32px;
+            background: rgba(15, 23, 42, 0.8);
             border-bottom: 1px solid var(--card-border);
             display: flex;
             justify-content: space-between;
             align-items: center;
+            backdrop-filter: blur(12px);
         }
 
         .header-info h1 {
-            font-size: 1.4rem;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.5rem;
             font-weight: 700;
-            color: var(--accent-color);
+            color: var(--text-primary);
         }
 
         .header-info p {
@@ -247,69 +310,121 @@ HTML_TEMPLATE = r"""
 
         .chat-box {
             flex: 1;
-            padding: 20px 28px;
+            padding: 24px 32px;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 16px;
+            gap: 20px;
         }
 
         .message {
             display: flex;
             flex-direction: column;
-            max-width: 80%;
-            border-radius: 12px;
-            padding: 14px 18px;
-            line-height: 1.6;
-            font-size: 0.95rem;
+            max-width: 82%;
+            border-radius: 16px;
+            padding: 16px 22px;
+            line-height: 1.65;
+            font-size: 0.96rem;
             white-space: pre-wrap;
             word-break: break-word;
+            animation: fadeIn 0.3s ease-out;
+            position: relative;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .message.user {
             align-self: flex-end;
-            background-color: var(--user-msg-bg);
+            background: var(--user-msg-bg);
             color: white;
-            border-bottom-right-radius: 2px;
+            border-bottom-right-radius: 4px;
+            box-shadow: 0 4px 20px rgba(2, 132, 199, 0.25);
         }
 
         .message.assistant {
             align-self: flex-start;
-            background-color: var(--assistant-msg-bg);
+            background: var(--assistant-msg-bg);
             border: 1px solid var(--card-border);
             color: var(--text-primary);
-            border-bottom-left-radius: 2px;
+            border-bottom-left-radius: 4px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        .message-action-btn {
+            position: absolute;
+            top: 10px;
+            right: 12px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--card-border);
+            color: var(--text-secondary);
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 0.72rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .message-action-btn:hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.18);
+        }
+
+        .toggle-sources-btn {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--card-border);
+            color: var(--text-secondary);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-top: 12px;
+            display: inline-block;
+        }
+
+        .toggle-sources-btn:hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.18);
         }
 
         .message-meta {
-            font-size: 0.75rem;
+            font-size: 0.76rem;
             color: var(--text-secondary);
-            margin-top: 8px;
+            margin-top: 10px;
+            display: flex;
+            gap: 12px;
+            align-items: center;
         }
 
         .chunks-container {
-            margin-top: 12px;
-            background: rgba(15, 23, 42, 0.7);
+            margin-top: 14px;
+            background: rgba(9, 13, 22, 0.8);
             border: 1px solid var(--card-border);
-            border-radius: 8px;
-            padding: 12px;
+            border-radius: 12px;
+            padding: 14px;
             white-space: normal;
         }
 
         .chunks-title {
             font-size: 0.8rem;
-            font-weight: 600;
-            color: var(--accent-color);
-            margin-bottom: 8px;
+            font-weight: 700;
+            color: var(--accent-cyan);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
 
         .chunk-item {
-            background: #1e293b;
-            border-left: 3px solid var(--accent-color);
-            padding: 10px 14px;
-            margin-bottom: 8px;
-            border-radius: 6px;
-            font-size: 0.85rem;
+            background: rgba(30, 41, 59, 0.7);
+            border-left: 3px solid var(--accent-cyan);
+            padding: 12px 14px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            font-size: 0.86rem;
             white-space: pre-wrap;
         }
 
@@ -325,38 +440,72 @@ HTML_TEMPLATE = r"""
 
         .score-badge {
             background: rgba(56, 189, 248, 0.15);
-            color: var(--accent-color);
+            color: var(--accent-cyan);
             border: 1px solid rgba(56, 189, 248, 0.3);
-            padding: 2px 8px;
-            border-radius: 12px;
+            padding: 3px 10px;
+            border-radius: 14px;
             font-size: 0.75rem;
+            font-weight: 600;
         }
 
+        /* Sample Prompt Chips */
+        .prompt-chips {
+            display: flex;
+            gap: 8px;
+            padding: 0 32px;
+            overflow-x: auto;
+            margin-bottom: 4px;
+        }
+
+        .chip {
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid var(--card-border);
+            color: var(--text-secondary);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.78rem;
+            font-weight: 500;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s ease;
+        }
+
+        .chip:hover {
+            color: var(--accent-cyan);
+            border-color: var(--accent-cyan);
+            background: rgba(56, 189, 248, 0.1);
+        }
+
+        /* Input Bar */
         .input-bar {
-            padding: 16px 28px;
-            background-color: #1e293b;
+            padding: 18px 32px 24px 32px;
+            background: rgba(15, 23, 42, 0.8);
             border-top: 1px solid var(--card-border);
             display: flex;
-            gap: 12px;
+            gap: 14px;
+            backdrop-filter: blur(12px);
         }
 
         .input-bar input {
             flex: 1;
-            background-color: var(--bg-color);
+            background-color: rgba(9, 13, 22, 0.8);
             border: 1px solid var(--card-border);
-            border-radius: 8px;
-            padding: 12px 16px;
+            border-radius: 12px;
+            padding: 14px 20px;
             color: white;
             font-size: 0.95rem;
             outline: none;
+            transition: border-color 0.2s ease;
         }
 
         .input-bar input:focus {
-            border-color: var(--accent-color);
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 16px var(--accent-glow);
         }
 
         .input-bar button {
-            width: 120px;
+            width: 130px;
+            border-radius: 12px;
         }
     </style>
 </head>
@@ -365,11 +514,16 @@ HTML_TEMPLATE = r"""
     <!-- Sidebar -->
     <div class="sidebar">
         <div class="brand">
-            <span class="brand-icon">⚡</span>
+            <div class="brand-icon">⚡</div>
             <div>
                 <div class="brand-title">Foundry Local</div>
-                <div class="brand-subtitle">Offline RAG Pro Studio</div>
+                <div class="brand-subtitle">Offline RAG Studio</div>
             </div>
+        </div>
+
+        <div class="status-pill">
+            <div class="pulse-dot"></div>
+            <span>OFFLINE ENGINE READY</span>
         </div>
 
         <hr style="border-color: var(--card-border);">
@@ -395,14 +549,14 @@ HTML_TEMPLATE = r"""
                 <div>
                     <div class="control-label">
                         <span>Top-K Passages:</span>
-                        <span id="top-k-val">3</span>
+                        <span id="top-k-val" style="color: var(--accent-cyan)">3</span>
                     </div>
                     <input type="range" class="slider" id="top-k-slider" min="1" max="6" value="3" oninput="document.getElementById('top-k-val').innerText = this.value">
                 </div>
                 <div>
                     <div class="control-label">
                         <span>Min Match Threshold:</span>
-                        <span id="thresh-val">15%</span>
+                        <span id="thresh-val" style="color: var(--accent-cyan)">15%</span>
                     </div>
                     <input type="range" class="slider" id="thresh-slider" min="5" max="40" value="15" oninput="document.getElementById('thresh-val').innerText = this.value + '%'">
                 </div>
@@ -425,7 +579,7 @@ HTML_TEMPLATE = r"""
         </div>
 
         <div>
-            <div class="section-title">Upload & Actions</div>
+            <div class="section-title">Upload & Storage</div>
             <button class="btn btn-secondary" onclick="document.getElementById('file-upload').click()">📁 Upload Files (.md, .txt, .pdf)</button>
             <input type="file" id="file-upload" accept=".txt,.md,.pdf" multiple style="display: none;" onchange="uploadFiles()">
             
@@ -435,7 +589,7 @@ HTML_TEMPLATE = r"""
         </div>
 
         <div style="margin-top: auto; font-size: 0.72rem; color: var(--text-secondary); text-align: center;">
-            Zero Internet Cloud Dependency<br>Powered by Microsoft Foundry Local
+            Zero Cloud Dependency<br>Powered by Microsoft Foundry Local
         </div>
     </div>
 
@@ -443,16 +597,27 @@ HTML_TEMPLATE = r"""
     <div class="main-container">
         <div class="header-banner">
             <div class="header-info">
-                <h1>Local RAG Q&A Assistant</h1>
-                <p>Grounding local documents with zero-cloud AI inference & live RAG tuning</p>
+                <h1>Local RAG Intelligence Studio</h1>
+                <p>Grounding local documents with zero-cloud AI inference & live vector search metrics</p>
             </div>
-            <div>
-                <button class="btn btn-secondary" onclick="exportChat()">📥 Export Chat (.md)</button>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn" style="width: auto; padding: 8px 14px;" onclick="clearChat()">🧹 Clear Chat</button>
+                <button class="btn btn-secondary" style="width: auto; padding: 8px 14px;" onclick="exportChat()">📥 Export Chat (.md)</button>
             </div>
         </div>
 
         <div class="chat-box" id="chat-box">
-            <div class="message assistant">Hello! I am your <b>Local RAG AI Assistant</b> running offline. Ask me any question about your ingested documents (course FAQ, Foundry Local guide, RAG architecture, or Python notes)!</div>
+            <div class="message assistant">
+                Hello! I am your <b>Local RAG AI Assistant</b> running 100% offline. Ask me any question about your ingested documents (course FAQ, Foundry Local guide, RAG architecture, or Python notes)!
+            </div>
+        </div>
+
+        <!-- Quick Suggestion Chips -->
+        <div class="prompt-chips">
+            <div class="chip" onclick="usePrompt('What is Microsoft Foundry Local?')">⚡ What is Microsoft Foundry Local?</div>
+            <div class="chip" onclick="usePrompt('How does cosine similarity work in RAG?')">📐 How cosine similarity works</div>
+            <div class="chip" onclick="usePrompt('What are the CS101 grading policies?')">📚 CS101 Grading Policies</div>
+            <div class="chip" onclick="usePrompt('What are Python clean code best practices?')">🐍 Python Clean Code</div>
         </div>
 
         <div class="input-bar">
@@ -463,6 +628,24 @@ HTML_TEMPLATE = r"""
 
     <script>
         var chatHistory = [];
+
+        function usePrompt(text) {
+            document.getElementById('user-input').value = text;
+            sendMessage();
+        }
+
+        function clearChat() {
+            var chatBox = document.getElementById('chat-box');
+            chatBox.innerHTML = '<div class="message assistant">Chat history cleared. How can I assist you with your local knowledge base?</div>';
+            chatHistory = [];
+        }
+
+        function copyAnswer(btn) {
+            var msgText = btn.parentElement.innerText.replace('📋 Copy', '').trim();
+            navigator.clipboard.writeText(msgText);
+            btn.innerText = '✅ Copied!';
+            setTimeout(function() { btn.innerText = '📋 Copy'; }, 2000);
+        }
 
         async function sendMessage() {
             try {
@@ -490,7 +673,7 @@ HTML_TEMPLATE = r"""
 
                 var loadingMsg = document.createElement('div');
                 loadingMsg.className = 'message assistant';
-                loadingMsg.innerText = 'Searching local documents & generating answer...';
+                loadingMsg.innerText = 'Searching local SQLite vector store & synthesizing grounded answer...';
                 chatBox.appendChild(loadingMsg);
                 chatBox.scrollTop = chatBox.scrollHeight;
 
@@ -509,14 +692,36 @@ HTML_TEMPLATE = r"""
                 loadingMsg.innerText = data.answer || 'No answer returned.';
                 chatHistory.push('Assistant: ' + (data.answer || ''));
 
+                var copyBtn = document.createElement('button');
+                copyBtn.className = 'message-action-btn';
+                copyBtn.innerText = '📋 Copy';
+                copyBtn.onclick = function() { copyAnswer(this); };
+                loadingMsg.appendChild(copyBtn);
+
                 var meta = document.createElement('div');
                 meta.className = 'message-meta';
-                meta.innerText = 'Latency: ' + (data.latency_seconds || 0) + 's | Engine: ' + (data.llm_provider || 'Offline');
+                meta.innerText = '⚡ Latency: ' + (data.latency_seconds || 0) + 's | Engine: ' + (data.llm_provider || 'Offline');
                 loadingMsg.appendChild(meta);
 
                 if (data.retrieved_chunks && data.retrieved_chunks.length > 0) {
                     var chunksContainer = document.createElement('div');
                     chunksContainer.className = 'chunks-container';
+                    chunksContainer.style.display = 'none';
+                    
+                    var toggleBtn = document.createElement('button');
+                    toggleBtn.className = 'toggle-sources-btn';
+                    toggleBtn.innerText = '🔍 Kaynakları Göster';
+                    toggleBtn.onclick = function() {
+                        if (chunksContainer.style.display === 'none') {
+                            chunksContainer.style.display = 'block';
+                            toggleBtn.innerText = '🔍 Kaynakları Gizle';
+                        } else {
+                            chunksContainer.style.display = 'none';
+                            toggleBtn.innerText = '🔍 Kaynakları Göster';
+                        }
+                        chatBox.scrollTop = chatBox.scrollHeight;
+                    };
+                    loadingMsg.appendChild(toggleBtn);
                     
                     var title = document.createElement('div');
                     title.className = 'chunks-title';
@@ -530,7 +735,7 @@ HTML_TEMPLATE = r"""
                         
                         var metaHeader = document.createElement('div');
                         metaHeader.className = 'chunk-meta';
-                        metaHeader.innerHTML = '<span>📄 ' + c.filename + ' (Chunk #' + c.chunk_index + ')</span><span class="score-badge">Match Score: ' + pct + '%</span>';
+                        metaHeader.innerHTML = '<span>📄 ' + c.filename + ' (Chunk #' + c.chunk_index + ')</span><span class="score-badge">🎯 Match Score: ' + pct + '%</span>';
                         
                         var contentBody = document.createElement('div');
                         contentBody.innerText = c.content || '';

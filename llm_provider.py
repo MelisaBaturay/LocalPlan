@@ -120,11 +120,10 @@ class OfflineFallbackProvider(BaseLLMProvider):
                 "(Yerel bilgi tabanında bu soruyla ilgili yeterli bilgi bulunmamaktadır.)"
             )
 
-        lines = ["Based on the local knowledge base:"]
-        for p in passages:
-            lines.append(f"\n{p}")
-            
-        return "\n".join(lines)
+        return (
+            "Relevant information was found in the local knowledge base. Please click the 'Show Sources' button below to review the detailed references.\n\n"
+            "(Yerel bilgi tabanında bu konuyla ilgili bilgiler bulundu. Lütfen detayları incelemek için aşağıdaki 'Kaynakları Göster' butonuna tıklayın.)"
+        )
 
     @property
     def provider_name(self) -> str:
