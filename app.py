@@ -32,19 +32,19 @@ HTML_TEMPLATE = r"""
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-dark: #090d16;
-            --sidebar-bg: #0f172a;
-            --card-bg: rgba(30, 41, 59, 0.7);
-            --card-border: rgba(255, 255, 255, 0.08);
-            --accent-cyan: #38bdf8;
-            --accent-glow: rgba(56, 189, 248, 0.25);
-            --accent-purple: #a855f7;
+            --bg-dark: #111111;
+            --sidebar-bg: #171717;
+            --card-bg: #262626;
+            --card-border: rgba(255, 255, 255, 0.1);
+            --accent-cyan: #e5e5e5;
+            --accent-glow: rgba(255, 255, 255, 0.05);
+            --accent-purple: #a3a3a3;
             --accent-emerald: #10b981;
-            --text-primary: #f8fafc;
-            --text-secondary: #94a3b8;
-            --user-msg-bg: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
-            --assistant-msg-bg: rgba(30, 41, 59, 0.85);
-            --danger-color: #f43f5e;
+            --text-primary: #f5f5f5;
+            --text-secondary: #a3a3a3;
+            --user-msg-bg: transparent;
+            --assistant-msg-bg: transparent;
+            --danger-color: #ef4444;
         }
 
         * {
@@ -355,41 +355,40 @@ HTML_TEMPLATE = r"""
 
         .message-wrapper {
             display: flex;
-            gap: 16px;
+            gap: 20px;
             width: 100%;
+            padding: 24px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
             animation: fadeIn 0.3s ease-out;
-            margin-bottom: 8px;
         }
 
         .message-wrapper.user {
-            flex-direction: row-reverse;
+            flex-direction: row;
         }
 
         .avatar {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            border-radius: 4px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.2rem;
             flex-shrink: 0;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            color: #fff;
         }
 
         .avatar.assistant {
-            background: linear-gradient(135deg, #a855f7 0%, #38bdf8 100%);
+            background: #10a37f;
         }
 
         .avatar.user {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            background: #4b5563;
         }
 
         .message {
             display: flex;
             flex-direction: column;
-            max-width: 75%;
-            padding: 14px 20px;
+            width: 100%;
             line-height: 1.6;
             font-size: 0.95rem;
             white-space: pre-wrap;
@@ -403,18 +402,18 @@ HTML_TEMPLATE = r"""
         }
 
         .message.user {
-            background: var(--user-msg-bg);
-            color: white;
-            border-radius: 20px 4px 20px 20px;
-            box-shadow: 0 4px 20px rgba(2, 132, 199, 0.25);
+            background: transparent;
+            color: var(--text-primary);
+            border-radius: 0;
+            box-shadow: none;
         }
 
         .message.assistant {
-            background: var(--assistant-msg-bg);
-            border: 1px solid var(--card-border);
+            background: transparent;
+            border: none;
             color: var(--text-primary);
-            border-radius: 4px 20px 20px 20px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            border-radius: 0;
+            box-shadow: none;
         }
 
         .message-action-btn {
@@ -920,7 +919,7 @@ HTML_TEMPLATE = r"""
 
         <div class="chat-box" id="chat-box">
             <div class="message-wrapper assistant">
-                <div class="avatar assistant">🤖</div>
+                <div class="avatar assistant"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3 7 7 3-7 3-3 7-3-7-7-3 7-3 3-7z"></path></svg></div>
                 <div class="message assistant">
                     Hello! I am your <b>Local RAG AI Assistant</b> running 100% offline. Ask me any question about your ingested documents (course FAQ, Foundry Local guide, RAG architecture, or Python notes)!
                 </div>
@@ -938,7 +937,9 @@ HTML_TEMPLATE = r"""
         <div class="input-bar-container">
             <div class="input-bar">
                 <input type="text" id="user-input" placeholder="Type your question here (e.g. What is Microsoft Foundry Local?)..." onkeydown="if(event.key==='Enter' || event.keyCode===13) sendMessage()">
-                <button class="btn btn-primary" id="send-btn" onclick="sendMessage()">➤</button>
+                <button class="btn btn-primary" id="send-btn" onclick="sendMessage()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                </button>
             </div>
         </div>
     </div>
@@ -964,7 +965,7 @@ HTML_TEMPLATE = r"""
             var chatBox = document.getElementById('chat-box');
             chatBox.innerHTML = `
             <div class="message-wrapper assistant">
-                <div class="avatar assistant">🤖</div>
+                <div class="avatar assistant"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3 7 7 3-7 3-3 7-3-7-7-3 7-3 3-7z"></path></svg></div>
                 <div class="message assistant">
                     Chat history cleared. How can I assist you with your local knowledge base?
                 </div>
@@ -996,7 +997,7 @@ HTML_TEMPLATE = r"""
 
                 var userWrapper = document.createElement('div');
                 userWrapper.className = 'message-wrapper user';
-                userWrapper.innerHTML = '<div class="avatar user">👤</div><div class="message user"></div>';
+                userWrapper.innerHTML = '<div class="avatar user"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></div><div class="message user"></div>';
                 userWrapper.querySelector('.message').innerText = question;
                 chatBox.appendChild(userWrapper);
                 inputField.value = '';
@@ -1006,7 +1007,7 @@ HTML_TEMPLATE = r"""
 
                 var assistantWrapper = document.createElement('div');
                 assistantWrapper.className = 'message-wrapper assistant';
-                assistantWrapper.innerHTML = '<div class="avatar assistant">🤖</div><div class="message assistant"><div class="typing-indicator"><span></span><span></span><span></span></div></div>';
+                assistantWrapper.innerHTML = '<div class="avatar assistant"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3 7 7 3-7 3-3 7-3-7-7-3 7-3 3-7z"></path></svg></div><div class="message assistant"><div class="typing-indicator"><span></span><span></span><span></span></div></div>';
                 chatBox.appendChild(assistantWrapper);
                 chatBox.scrollTop = chatBox.scrollHeight;
                 
