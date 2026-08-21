@@ -911,11 +911,7 @@ HTML_TEMPLATE = r"""
     <!-- Main Container -->
     <div class="main-container">
         <div class="header-banner">
-            <div class="header-info">
-                <h1>Yerel RAG İstihbarat Stüdyosu</h1>
-                <p>Veri gizliliğinden ödün vermeden, tamamen yerel makinede çalışan güçlü ve şeffaf yapay zeka asistanı.</p>
-            </div>
-            <div style="display: flex; gap: 10px;">
+            <div style="display: flex; gap: 10px; margin-left: auto;">
                 <button class="btn btn-primary" style="width: auto; padding: 8px 14px; background: rgba(56, 189, 248, 0.2); border-color: var(--accent-cyan); color: var(--accent-cyan);" onclick="toggleDashboard()">📊 Sistem Mimarisi & Analiz</button>
                 <button class="btn" style="width: auto; padding: 8px 14px;" onclick="clearChat()">🧹 Clear Chat</button>
                 <button class="btn btn-secondary" style="width: auto; padding: 8px 14px;" onclick="exportChat()">📥 Export Chat (.md)</button>
