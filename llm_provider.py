@@ -114,22 +114,22 @@ class OfflineFallbackProvider(BaseLLMProvider):
             return "Yerel bilgi tabanında bu soruyla ilgili herhangi bir bilgi bulunamadı."
 
         try:
-            best_passage = passages[0]
-            content = best_passage.split("]\n", 1)[1].strip()
-            
-            # Normal chat (ChatGPT) gibi görünmesi için markdown başlıklarını (#) temizle
-            lines = content.split('\n')
-            clean_lines = []
-            for line in lines:
-                line = line.strip()
-                if line.startswith('#'):
-                    continue
-                if line:
-                    clean_lines.append(line)
-                    
-            if clean_lines:
-                return "\n\n".join(clean_lines)
-            return content
+            combined_lines = []
+            for passage in passages:
+                content = passage.split("]\n", 1)[1].strip()
+                
+                # Normal chat (ChatGPT) gibi görünmesi için markdown başlıklarını (#) temizle
+                lines = content.split('\n')
+                for line in lines:
+                    line = line.strip()
+                    if line.startswith('#'):
+                        continue
+                    if line and line not in combined_lines:
+                        combined_lines.append(line)
+                        
+            if combined_lines:
+                return "\n\n".join(combined_lines)
+            return passages[0].split("]\n", 1)[1].strip()
         except Exception:
             return "Maalesef bu soruya uygun net bir cevap çıkaramadım."
 
