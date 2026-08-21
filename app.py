@@ -62,6 +62,43 @@ HTML_TEMPLATE = r"""
             overflow: hidden;
         }
 
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.3);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(148, 163, 184, 0.2);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(148, 163, 184, 0.4);
+        }
+
+        /* Typing Indicator */
+        .typing-indicator {
+            display: inline-flex;
+            gap: 5px;
+            align-items: center;
+            padding: 4px 2px;
+        }
+        .typing-indicator span {
+            width: 6px;
+            height: 6px;
+            background-color: var(--accent-cyan);
+            border-radius: 50%;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+        .typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
+        .typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+
         /* Sidebar Styling */
         .sidebar {
             width: 340px;
@@ -202,10 +239,9 @@ HTML_TEMPLATE = r"""
             border: 1px solid var(--card-border);
             border-radius: 10px;
             padding: 11px 16px;
-            font-weight: 600;
             font-size: 0.85rem;
             cursor: pointer;
-            transition: all 0.25s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             width: 100%;
             display: flex;
             align-items: center;
@@ -508,18 +544,22 @@ HTML_TEMPLATE = r"""
             border-radius: 12px;
         }
 
-        /* Dashboard Modal */
         .dashboard-modal {
             display: none;
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(4, 7, 13, 0.96);
+            background: rgba(4, 7, 13, 0.90);
             z-index: 1000;
-            backdrop-filter: blur(16px);
+            backdrop-filter: blur(24px);
             padding: 40px;
             overflow-y: auto;
             color: white;
-            animation: fadeIn 0.3s ease-out;
+            animation: modalPop 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        
+        @keyframes modalPop {
+            from { opacity: 0; transform: scale(0.97) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
         }
 
         .dashboard-header {
@@ -914,7 +954,7 @@ HTML_TEMPLATE = r"""
 
                 var loadingMsg = document.createElement('div');
                 loadingMsg.className = 'message assistant';
-                loadingMsg.innerText = 'Searching local SQLite vector store & synthesizing grounded answer...';
+                loadingMsg.innerHTML = '<div class="typing-indicator"><span></span><span></span><span></span></div>';
                 chatBox.appendChild(loadingMsg);
                 chatBox.scrollTop = chatBox.scrollHeight;
 
@@ -1088,41 +1128,54 @@ def index():
 
 @app.route('/api/query', methods=['POST'])
 def query():
-    data = request.get_json() or {}
-    question = data.get('question', '').strip()
-    top_k = data.get('top_k')
-    threshold = data.get('threshold')
-    
-    if not question:
-        return jsonify({'answer': 'Please enter a valid question.'})
+    try:
+        data = request.get_json() or {}
+        question = data.get('question', '').strip()
+        top_k = data.get('top_k')
+        threshold = data.get('threshold')
         
-    response = engine.ask(question, top_k=top_k, similarity_threshold=threshold)
-    return jsonify({
-        'question': response.question,
-        'answer': response.answer,
-        'retrieved_chunks': response.retrieved_chunks,
-        'llm_provider': response.llm_provider,
-        'latency_seconds': response.latency_seconds
-    })
+        if not question:
+            return jsonify({'answer': 'Please enter a valid question.'})
+            
+        stats = db.get_stats()
+        if stats['total_chunks'] == 0:
+            return jsonify({'answer': 'Knowledge base is empty. Please upload some documents from the sidebar first.'})
+            
+        response = engine.ask(question, top_k=top_k, similarity_threshold=threshold)
+        return jsonify({
+            'question': response.question,
+            'answer': response.answer,
+            'retrieved_chunks': response.retrieved_chunks,
+            'llm_provider': response.llm_provider,
+            'latency_seconds': response.latency_seconds
+        })
+    except Exception as e:
+        return jsonify({'answer': f'An unexpected error occurred during processing: {str(e)}'}), 500
 
 @app.route('/api/ingest', methods=['POST'])
 def ingest():
-    res = run_ingestion()
-    return jsonify(res)
+    try:
+        res = run_ingestion()
+        return jsonify(res)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/api/upload', methods=['POST'])
 def upload():
-    uploaded_files = request.files.getlist('files')
-    saved_count = 0
-    for file in uploaded_files:
-        if file.filename:
-            save_path = config.docs_dir / file.filename
-            file.save(str(save_path))
-            saved_count += 1
-            
-    res = run_ingestion()
-    res['uploaded_count'] = saved_count
-    return jsonify(res)
+    try:
+        uploaded_files = request.files.getlist('files')
+        saved_count = 0
+        for file in uploaded_files:
+            if file.filename:
+                save_path = config.docs_dir / file.filename
+                file.save(str(save_path))
+                saved_count += 1
+                
+        res = run_ingestion()
+        res['uploaded_count'] = saved_count
+        return jsonify(res)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/api/documents/delete', methods=['POST'])
 def delete_doc():
@@ -1157,4 +1210,4 @@ if __name__ == '__main__':
     print("=======================================================\n")
     
     threading.Thread(target=open_browser, daemon=True).start()
-    app.run(host='127.0.0.1', port=5000, debug=False)
+    app.run(host='127.0.0.1', port=5000, debug=False, threaded=True)
