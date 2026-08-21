@@ -353,17 +353,47 @@ HTML_TEMPLATE = r"""
             gap: 20px;
         }
 
+        .message-wrapper {
+            display: flex;
+            gap: 16px;
+            width: 100%;
+            animation: fadeIn 0.3s ease-out;
+            margin-bottom: 8px;
+        }
+
+        .message-wrapper.user {
+            flex-direction: row-reverse;
+        }
+
+        .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .avatar.assistant {
+            background: linear-gradient(135deg, #a855f7 0%, #38bdf8 100%);
+        }
+
+        .avatar.user {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+
         .message {
             display: flex;
             flex-direction: column;
-            max-width: 82%;
-            border-radius: 16px;
-            padding: 16px 22px;
-            line-height: 1.65;
-            font-size: 0.96rem;
+            max-width: 75%;
+            padding: 14px 20px;
+            line-height: 1.6;
+            font-size: 0.95rem;
             white-space: pre-wrap;
             word-break: break-word;
-            animation: fadeIn 0.3s ease-out;
             position: relative;
         }
 
@@ -373,19 +403,17 @@ HTML_TEMPLATE = r"""
         }
 
         .message.user {
-            align-self: flex-end;
             background: var(--user-msg-bg);
             color: white;
-            border-bottom-right-radius: 4px;
+            border-radius: 20px 4px 20px 20px;
             box-shadow: 0 4px 20px rgba(2, 132, 199, 0.25);
         }
 
         .message.assistant {
-            align-self: flex-start;
             background: var(--assistant-msg-bg);
             border: 1px solid var(--card-border);
             color: var(--text-primary);
-            border-bottom-left-radius: 4px;
+            border-radius: 4px 20px 20px 20px;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
         }
 
@@ -513,35 +541,55 @@ HTML_TEMPLATE = r"""
         }
 
         /* Input Bar */
-        .input-bar {
-            padding: 18px 32px 24px 32px;
-            background: rgba(15, 23, 42, 0.8);
-            border-top: 1px solid var(--card-border);
+        .input-bar-container {
+            padding: 0 32px 24px 32px;
+            background: transparent;
             display: flex;
-            gap: 14px;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .input-bar {
+            width: 100%;
+            max-width: 850px;
+            background: rgba(30, 41, 59, 0.85);
+            border: 1px solid var(--card-border);
+            border-radius: 28px;
+            display: flex;
+            align-items: center;
+            padding: 6px 8px 6px 20px;
             backdrop-filter: blur(12px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .input-bar:focus-within {
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 20px var(--accent-glow);
         }
 
         .input-bar input {
             flex: 1;
-            background-color: rgba(9, 13, 22, 0.8);
-            border: 1px solid var(--card-border);
-            border-radius: 12px;
-            padding: 14px 20px;
+            background: transparent;
+            border: none;
+            padding: 10px 0;
             color: white;
             font-size: 0.95rem;
             outline: none;
-            transition: border-color 0.2s ease;
-        }
-
-        .input-bar input:focus {
-            border-color: var(--accent-cyan);
-            box-shadow: 0 0 16px var(--accent-glow);
         }
 
         .input-bar button {
-            width: 130px;
-            border-radius: 12px;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            margin-left: 12px;
+            font-size: 1.1rem;
+            flex-shrink: 0;
         }
 
         .dashboard-modal {
@@ -875,8 +923,11 @@ HTML_TEMPLATE = r"""
         </div>
 
         <div class="chat-box" id="chat-box">
-            <div class="message assistant">
-                Hello! I am your <b>Local RAG AI Assistant</b> running 100% offline. Ask me any question about your ingested documents (course FAQ, Foundry Local guide, RAG architecture, or Python notes)!
+            <div class="message-wrapper assistant">
+                <div class="avatar assistant">🤖</div>
+                <div class="message assistant">
+                    Hello! I am your <b>Local RAG AI Assistant</b> running 100% offline. Ask me any question about your ingested documents (course FAQ, Foundry Local guide, RAG architecture, or Python notes)!
+                </div>
             </div>
         </div>
 
@@ -888,9 +939,11 @@ HTML_TEMPLATE = r"""
             <div class="chip" onclick="usePrompt('What are Python clean code best practices?')">🐍 Python Clean Code</div>
         </div>
 
-        <div class="input-bar">
-            <input type="text" id="user-input" placeholder="Type your question here (e.g. What is Microsoft Foundry Local?)..." onkeydown="if(event.key==='Enter' || event.keyCode===13) sendMessage()">
-            <button class="btn btn-primary" id="send-btn" onclick="sendMessage()">Send</button>
+        <div class="input-bar-container">
+            <div class="input-bar">
+                <input type="text" id="user-input" placeholder="Type your question here (e.g. What is Microsoft Foundry Local?)..." onkeydown="if(event.key==='Enter' || event.keyCode===13) sendMessage()">
+                <button class="btn btn-primary" id="send-btn" onclick="sendMessage()">➤</button>
+            </div>
         </div>
     </div>
 
@@ -913,7 +966,13 @@ HTML_TEMPLATE = r"""
 
         function clearChat() {
             var chatBox = document.getElementById('chat-box');
-            chatBox.innerHTML = '<div class="message assistant">Chat history cleared. How can I assist you with your local knowledge base?</div>';
+            chatBox.innerHTML = `
+            <div class="message-wrapper assistant">
+                <div class="avatar assistant">🤖</div>
+                <div class="message assistant">
+                    Chat history cleared. How can I assist you with your local knowledge base?
+                </div>
+            </div>`;
             chatHistory = [];
         }
 
@@ -939,19 +998,23 @@ HTML_TEMPLATE = r"""
 
                 var chatBox = document.getElementById('chat-box');
 
-                var userMsg = document.createElement('div');
-                userMsg.className = 'message user';
-                userMsg.innerText = question;
-                chatBox.appendChild(userMsg);
+                var userWrapper = document.createElement('div');
+                userWrapper.className = 'message-wrapper user';
+                userWrapper.innerHTML = '<div class="avatar user">👤</div><div class="message user"></div>';
+                userWrapper.querySelector('.message').innerText = question;
+                chatBox.appendChild(userWrapper);
                 inputField.value = '';
                 chatBox.scrollTop = chatBox.scrollHeight;
 
                 chatHistory.push('User: ' + question);
 
-                var loadingMsg = document.createElement('div');
-                loadingMsg.className = 'message assistant';
-                loadingMsg.innerHTML = '<div class="typing-indicator"><span></span><span></span><span></span></div>';
-                chatBox.appendChild(loadingMsg);
+                var assistantWrapper = document.createElement('div');
+                assistantWrapper.className = 'message-wrapper assistant';
+                assistantWrapper.innerHTML = '<div class="avatar assistant">🤖</div><div class="message assistant"><div class="typing-indicator"><span></span><span></span><span></span></div></div>';
+                chatBox.appendChild(assistantWrapper);
+                chatBox.scrollTop = chatBox.scrollHeight;
+                
+                var loadingMsg = assistantWrapper.querySelector('.message');
                 chatBox.scrollTop = chatBox.scrollHeight;
 
                 var response = await fetch('/api/query', {
