@@ -102,28 +102,29 @@ class OfflineFallbackProvider(BaseLLMProvider):
     
     def generate_response(self, system_prompt: str, user_prompt: str) -> str:
         if "Context Passages:" not in user_prompt or "No relevant document passages found" in user_prompt:
-            return (
-                "I do not have enough information in the local knowledge base to answer this question.\n"
-                "(Yerel bilgi tabanında bu soruyla ilgili yeterli bilgi bulunmamaktadır.)\n\n"
-                "*Note: Please ensure relevant documents are ingested into the database.*"
-            )
+            return "Yerel bilgi tabanında bu soruyla ilgili herhangi bir bilgi bulunamadı. Lütfen kütüphaneye ilgili dokümanları yüklediğinizden emin olun."
 
         try:
             context_part = user_prompt.split("Context Passages:")[1].split("Question:")[0].strip()
             passages = [p.strip() for p in context_part.split("\n\n---\n\n") if p.strip()]
         except Exception:
-            passages = [user_prompt]
+            passages = []
 
         if not passages:
-            return (
-                "I do not have enough information in the local knowledge base to answer this question.\n"
-                "(Yerel bilgi tabanında bu soruyla ilgili yeterli bilgi bulunmamaktadır.)"
-            )
+            return "Yerel bilgi tabanında bu soruyla ilgili herhangi bir bilgi bulunamadı."
 
-        return (
-            "Relevant information was found in the local knowledge base. Please click the 'Show Sources' button below to review the detailed references.\n\n"
-            "(Yerel bilgi tabanında bu konuyla ilgili bilgiler bulundu. Lütfen detayları incelemek için aşağıdaki 'Kaynakları Göster' butonuna tıklayın.)"
-        )
+        try:
+            best_passage = passages[0]
+            content = best_passage.split("]\n", 1)[1].strip()
+            return (
+                f"İşte belgelerinizden bulduğum cevap:\n\n"
+                f"{content}\n\n"
+                f"*(Diğer alternatif kaynaklar ve eşleşme skorları için aşağıdaki 'Kaynakları Göster' butonuna tıklayabilirsiniz.)*"
+            )
+        except Exception:
+            return (
+                "Yerel bilgi tabanında bu konuyla ilgili bilgiler bulundu. Lütfen detayları incelemek için aşağıdaki 'Kaynakları Göster' butonuna tıklayın."
+            )
 
     @property
     def provider_name(self) -> str:
