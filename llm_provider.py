@@ -102,7 +102,7 @@ class OfflineFallbackProvider(BaseLLMProvider):
     
     def generate_response(self, system_prompt: str, user_prompt: str) -> str:
         if "Context Passages:" not in user_prompt or "No relevant document passages found" in user_prompt:
-            return "Yerel bilgi tabanında bu soruyla ilgili herhangi bir bilgi bulunamadı. Lütfen kütüphaneye ilgili dokümanları yüklediğinizden emin olun."
+            return "Yerel bilgi tabanında bu soruyla ilgili herhangi bir bilgi bulunamadı."
 
         try:
             context_part = user_prompt.split("Context Passages:")[1].split("Question:")[0].strip()
@@ -116,15 +116,22 @@ class OfflineFallbackProvider(BaseLLMProvider):
         try:
             best_passage = passages[0]
             content = best_passage.split("]\n", 1)[1].strip()
-            return (
-                f"İşte belgelerinizden bulduğum cevap:\n\n"
-                f"{content}\n\n"
-                f"*(Diğer alternatif kaynaklar ve eşleşme skorları için aşağıdaki 'Kaynakları Göster' butonuna tıklayabilirsiniz.)*"
-            )
+            
+            # Normal chat (ChatGPT) gibi görünmesi için markdown başlıklarını (#) temizle
+            lines = content.split('\n')
+            clean_lines = []
+            for line in lines:
+                line = line.strip()
+                if line.startswith('#'):
+                    continue
+                if line:
+                    clean_lines.append(line)
+                    
+            if clean_lines:
+                return "\n\n".join(clean_lines)
+            return content
         except Exception:
-            return (
-                "Yerel bilgi tabanında bu konuyla ilgili bilgiler bulundu. Lütfen detayları incelemek için aşağıdaki 'Kaynakları Göster' butonuna tıklayın."
-            )
+            return "Maalesef bu soruya uygun net bir cevap çıkaramadım."
 
     @property
     def provider_name(self) -> str:
