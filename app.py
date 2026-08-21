@@ -785,11 +785,7 @@ HTML_TEMPLATE = r"""
     <!-- Sidebar -->
     <div class="sidebar">
         <div class="brand">
-            <div class="brand-icon">⚡</div>
-            <div>
-                <div class="brand-title">Yerel RAG Stüdyosu</div>
-                <div class="brand-subtitle">Çevrimdışı Yapay Zeka</div>
-            </div>
+            <div class="brand-title" style="font-size: 1.8rem; margin: 0 auto; text-align: center; width: 100%;">Ragchat</div>
         </div>
 
         <div class="status-pill">
