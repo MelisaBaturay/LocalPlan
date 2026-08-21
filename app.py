@@ -787,8 +787,8 @@ HTML_TEMPLATE = r"""
         <div class="brand">
             <div class="brand-icon">⚡</div>
             <div>
-                <div class="brand-title">Foundry Local</div>
-                <div class="brand-subtitle">Offline RAG Studio</div>
+                <div class="brand-title">Yerel RAG Stüdyosu</div>
+                <div class="brand-subtitle">Çevrimdışı Yapay Zeka</div>
             </div>
         </div>
 
@@ -860,7 +860,7 @@ HTML_TEMPLATE = r"""
         </div>
 
         <div style="margin-top: auto; font-size: 0.72rem; color: var(--text-secondary); text-align: center;">
-            Zero Cloud Dependency<br>Powered by Microsoft Foundry Local
+            Sıfır Bulut Bağımlılığı<br>Maksimum Veri Gizliliği
         </div>
     </div>
 
@@ -868,8 +868,8 @@ HTML_TEMPLATE = r"""
     <div class="main-container">
         <div class="header-banner">
             <div class="header-info">
-                <h1>Local RAG Intelligence Studio</h1>
-                <p>Grounding local documents with zero-cloud AI inference & live vector search metrics</p>
+                <h1>Yerel RAG İstihbarat Stüdyosu</h1>
+                <p>Veri gizliliğinden ödün vermeden, tamamen yerel makinede çalışan güçlü ve şeffaf yapay zeka asistanı.</p>
             </div>
             <div style="display: flex; gap: 10px;">
                 <button class="btn btn-primary" style="width: auto; padding: 8px 14px; background: rgba(56, 189, 248, 0.2); border-color: var(--accent-cyan); color: var(--accent-cyan);" onclick="toggleDashboard()">📊 Sistem Mimarisi & Analiz</button>
