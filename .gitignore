@@ -34,3 +34,5 @@ data/vector_store.db
 .pytest_cache/
 test_page.html
 test_page_clean.html
+
+promo_script.md
